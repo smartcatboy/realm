@@ -6,7 +6,10 @@ use tokio::time::sleep;
 use trust_dns_resolver::config::*;
 use trust_dns_resolver::TokioAsyncResolver;
 
-async fn resolve_single(resolver: &TokioAsyncResolver, addr: &String) -> Option<net::IpAddr> {
+async fn resolve_single(
+    resolver: &TokioAsyncResolver,
+    addr: &String,
+) -> Option<net::IpAddr> {
     if let Ok(ip) = addr.parse::<net::IpAddr>() {
         return Some(ip);
     }
@@ -26,11 +29,18 @@ async fn resolve_single(resolver: &TokioAsyncResolver, addr: &String) -> Option<
     }
 }
 
-pub async fn resolve(addr_list: Vec<String>, ip_list: Vec<Rc<RefCell<net::IpAddr>>>) {
-    let resolver =
-        async { TokioAsyncResolver::tokio(ResolverConfig::default(), ResolverOpts::default()) }
-            .await
-            .unwrap();
+pub async fn resolve(
+    addr_list: Vec<String>,
+    ip_list: Vec<Rc<RefCell<net::IpAddr>>>,
+) {
+    let resolver = async {
+        TokioAsyncResolver::tokio(
+            ResolverConfig::default(),
+            ResolverOpts::default(),
+        )
+    }
+    .await
+    .unwrap();
     loop {
         for (i, addr) in addr_list.iter().enumerate() {
             if let Some(new_ip) = resolve_single(&resolver, addr).await {
